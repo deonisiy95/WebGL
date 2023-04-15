@@ -1,1 +1,3 @@
 # WebGL
+
+Sample WebGL app
