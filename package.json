@@ -1,0 +1,28 @@
+{
+  "name": "WebGL",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/deonisiy95/WebGL.git",
+  "author": "denis <deonisiy9572@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "gl-matrix": "^3.4.3"
+  },
+  "scripts": {
+    "dev": "webpack-dev-server",
+    "start": "webpack"
+  },
+  "devDependencies": {
+    "webpack-cli": "^5.0.2",
+    "@babel/core": "^7.21.4",
+    "@babel/preset-env": "^7.21.4",
+    "babel-loader": "^9.1.2",
+    "webpack": "^5.80.0",
+    "webpack-dev-server": "^4.13.3"
+  },
+  "babel": {
+    "presets": [
+      "@babel/env"
+    ]
+  }
+}
