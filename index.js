@@ -1,7 +1,8 @@
-import {createShader, createProgram, resizeCanvasToDisplaySize} from './utils.js';
+import {createShader, createProgram, resizeCanvasToDisplaySize} from './utils/base';
 import {vertexShaderSource} from './shaders/vertex2.js';
 import {fragmentShaderSource} from './shaders/fragment2.js';
 import {mat4} from 'gl-matrix';
+import {setMouseControl} from './utils/control'
 
 window.onload = () => {
   const canvas = document.getElementById('canvas');
@@ -31,6 +32,9 @@ window.onload = () => {
 
   const vertexBuffer = gl.createBuffer();
   const vertices = [
+    -1, -1, -1,
+    1, -1, -1,
+    -1, -1, 1,
     // Передняя грань
     -1, -1, -1,
     1, -1, -1,
@@ -90,6 +94,9 @@ window.onload = () => {
 
   const colorBuffer = gl.createBuffer();
   const colors = [
+    1, 1, 0.5,
+    1, 0.5, 1,
+    1, 0.5, 0.5,
     // Передняя грань
     1, 0.5, 0.5,
     1, 0.5, 0.5,
@@ -144,29 +151,20 @@ window.onload = () => {
   const cubeMatrix = mat4.create();
   const cameraMatrix = mat4.create();
   mat4.perspective(cameraMatrix, 0.785, window.innerWidth / window.innerHeight, 0.1, 1000);
-  mat4.translate(cameraMatrix, cameraMatrix, [0, 0, -5]);
+  mat4.translate(cameraMatrix, cameraMatrix, [0, 0, -10]);
 
   // Запомним время последней отрисовки кадра
   let lastRenderTime = Date.now();
 
-  function render() {
-    // Запрашиваем рендеринг на следующий кадр
-    requestAnimationFrame(render);
+  function render(angleX, angleY) {
+    // requestAnimationFrame(render);
 
-    // Получаем время прошедшее с прошлого кадра
-    var time = Date.now();
-    var dt = lastRenderTime - time;
+    mat4.rotateY(cubeMatrix, cubeMatrix, angleX);
+    mat4.rotateX(cubeMatrix, cubeMatrix, angleY);
 
-    // Вращаем куб относительно оси Y
-    mat4.rotateY(cubeMatrix, cubeMatrix, dt / 1000);
-    // Вращаем куб относительно оси Z
-    mat4.rotateZ(cubeMatrix, cubeMatrix, dt / 1000);
-
-    // Очищаем сцену, закрашивая её в белый цвет
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // Включаем фильтр глубины
     gl.enable(gl.DEPTH_TEST);
 
     gl.useProgram(program);
@@ -182,48 +180,15 @@ window.onload = () => {
     gl.uniformMatrix4fv(uCube, false, cubeMatrix);
     gl.uniformMatrix4fv(uCamera, false, cameraMatrix);
 
-    gl.drawArrays(gl.TRIANGLES, 0, 36);
+    gl.drawArrays(gl.TRIANGLES, 0, 39);
 
     lastRenderTime = time;
   }
 
-  render();
+  render(0, 0);
 
-  // const positionAttributeLocation = gl.getAttribLocation(program, 'a_position');
-  // const positionBuffer = gl.createBuffer();
-  //
-  // gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  //
-  // const positions = [
-  //   0, 0,
-  //   0, 0.5,
-  //   0.7, 0,
-  // ];
-  //
-  // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-  //
-  // // -------
-  //
-  // resizeCanvasToDisplaySize(canvas);
-  // gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  //
-  // gl.clearColor(0, 0, 0, 0);
-  // gl.clear(gl.COLOR_BUFFER_BIT);
-  //
-  // gl.useProgram(program);
-  //
-  // gl.enableVertexAttribArray(positionAttributeLocation);
-  //
-  // gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  //
-  // const size = 2;
-  // const type = gl.FLOAT;
-  // const normalize = false;
-  // const stride = 0;
-  // const offset = 0;
-  // gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset);
-  //
-  // const primitiveType = gl.TRIANGLES;
-  // gl.drawArrays(primitiveType, 0, 3);
+  window.foo = (a) => render(a);
+
+  setMouseControl(render);
 }
 
